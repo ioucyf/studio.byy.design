@@ -1,0 +1,20 @@
+{
+  "tasks": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "generate:icons": "deno run scripts/generate-icons.js"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+    "vite": "npm:vite",
+    "vite-plugin-favicon2": "npm:vite-plugin-favicon2",
+    "autoprefixer": "npm:autoprefixer",
+    "postcss": "npm:postcss",
+    "postcss-font-grabber": "npm:postcss-font-grabber",
+    "postcss-import": "npm:postcss-import",
+    "sharp": "npm:sharp",
+    "fsevents": "npm:fsevents"
+    
+  }
+}

@@ -1,6 +1,6 @@
-import { writeFileSync, mkdirSync } from 'fs';
-import path from 'path';
-import favicons from 'favicons';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import path from 'node:path';
+import favicons from 'vite-plugin-favicon2';
 
 const source = path.resolve('src/assets/icon-1024.png'); // your high-res image
 const outputDir = path.resolve('public/assets'); // or src/assets if you prefer
