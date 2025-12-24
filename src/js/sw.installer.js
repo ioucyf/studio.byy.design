@@ -1,39 +1,46 @@
 if ('serviceWorker' in navigator) {
+  const showUpdateButton = (registration) => {
+    const updateButton = document.querySelector('#update-button');
+    if (registration.waiting) {
+      updateButton.classList.add('update');
+      updateButton.addEventListener('click', () => {
+        // Tell the waiting service worker to activate
+        registration.waiting.postMessage({ action: 'skipWaiting' });
+      });
+    }
+  };
+
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('service-worker.js') // ✅ make sure this matches the GitHub-generated path
+      .register('/service-worker.js')
       .then(registration => {
-        // console.log('Service worker registered:', registration);
+        console.log('Service worker registered.');
 
-        // 🔁 Force update check on load (optional)
-        registration.update();
+        // Check for an update every hour
+        setInterval(() => {
+          registration.update();
+        }, 1000 * 60 * 60); 
 
-        // 🔄 Listen for messages from the service worker
-        // navigator.serviceWorker.addEventListener('message', event => {
-        //   if (event.data === 'reload') {
-        //     window.location.reload();
-        //   } else if (event.data === 'no-update') {
-        //     alert('You’re already up to date.');
-        //   }
-        // });
+        // Show update button if a new service worker is waiting
+        showUpdateButton(registration);
 
-        // ☑️ If user clicks "Update" button, check for new version
-        // const updateButton = document.getElementById('update-button');
-        // if (updateButton) {
-        //   updateButton.addEventListener('click', () => {
-        //     if (navigator.serviceWorker.controller) {
-        //       navigator.serviceWorker.controller.postMessage('check-for-update');
-        //     }
-        //   });
-        // }
-
-        // 💡 Optional: reload the page when new SW takes over
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          window.location.reload();
+        // When a new SW is installed, check if it's waiting
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed') {
+              showUpdateButton(registration);
+            }
+          });
         });
       })
       .catch(error => {
         console.error('Service worker registration failed:', error);
       });
+
+    // Reload the page if a new service worker has taken control
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
   });
 }

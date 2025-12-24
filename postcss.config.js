@@ -1,8 +1,8 @@
-// postcss.config.js
-module.exports = {
+export default {
   plugins: {
-    'postcss-preset-env': {}, // optional
-    'autoprefixer': {},       // optional
-    'cssnano': {}             // minifies the output
+    'postcss-import': {},
+    'postcss-preset-env': {},
+    'autoprefixer': {},
+    'cssnano': {}
   }
 };

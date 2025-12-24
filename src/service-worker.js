@@ -1,142 +1,66 @@
 const CACHE_NAME = 'cache-__BUILD_SHA__';
 const ASSETS = __ASSETS__;
-const OWNER = 'ioucyf'; // GitHub username or org
-const REPO = 'prints.byy.design';     // Your repo name
-const BRANCH = 'main';
-// this is a test comment to check
-// if the service worker is being updated correctly
 
-
-async function getCurrentCacheName() {
-  const keys = await caches.keys();
-  const cacheKey = keys.find(k => k.startsWith(CACHE_NAME));
-  return cacheKey || null;
-};
-
-async function cacheAllAssets(event) {
-  const cache = await caches.open(CACHE_NAME);
-  await cache.addAll(ASSETS.map(asset => {
-    return asset.replace(/^[/]/, '');
-  }));
-  self.skipWaiting();
-}
-
-async function cacheAllAssetsIndividually(event) {
-  const cache = await caches.open(CACHE_NAME);
-  for (const asset of ASSETS) {
-    try {
-      await cache.add(asset);
-      console.log(`[SW] Cached: ${asset}`);
-    } catch (err) {
-      console.warn(`[SW] Failed to cache: ${asset}`, err);
-    }
-  }
-  self.skipWaiting();
-}
-
-
-
-async function deleteOldCaches(event) {
-  const keys = await caches.keys();
-  await Promise.all(keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : null)));
-  self.clients.claim();
-}
-
-async function deleteThenUpdate(event) {
-  await deleteOldCaches(event);
-  await cacheAllAssets(event);
-}
-
-
-async function handleUpdate(event) {
-  const currentCache = await getCurrentCacheName();
-  if (currentCache) return;
-
-
-  const keys = await caches.keys();
-  for (const key of keys) {
-    await caches.delete(key);
-    console.log('[SW] Deleted old cache:', key);
-  }
-
-  const newCache = await caches.open(CACHE_NAME);
-  await newCache.addAll(ASSETS);
-  console.log('[SW] New cache created:', CACHE_NAME);
-
-
-  self.skipWaiting();
-  // const clients = await self.clients.matchAll();
-  // for (const client of clients) {
-  //   client.postMessage('reload');
-  // }
-}
-
-async function cacheFirst(event) {
-  const cache = await caches.open(CACHE_NAME);
-
-  const cachedResponse = await cache.match(event.request);
-  if (cachedResponse) {
-    console.log('[SW] Serving from cache:', event.request.url);
-    return cachedResponse;
-  }
-
-  console.log('[SW] Fetching from network:', event.request.url);
-  const networkResponse = await fetch(event.request).then(response => {
-    console.log('[SW] Network response received:', response);
-    return response;
-  })
-    .catch(err => {
-      console.error(err);
-      return null;
-    });
-
-  console.log('[SW] Network response:', networkResponse);
-  if (networkResponse && networkResponse.ok) {
-    await cache.put(event.request, networkResponse.clone());
-    console.log('[SW] Cached new response:', event.request.url);
-  } else {
-    console.warn('[SW] Failed to fetch or cache:', event.request.url);
-    if (networkResponse) {
-      console.warn('[SW] Network response status:', networkResponse);
-    }
-  }
-  return networkResponse || new Response(null, { status: 404, statusText: 'Not Found' });
-}
-
-
-// SERVICE WORKER EVENTS HANDLERS
-
+// Install event: cache all assets
 self.addEventListener('install', event => {
   event.waitUntil(
-    // cacheAllAssets(event)
-    // deleteThenUpdate(event)
-    handleUpdate(event)
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('[SW] Caching all assets');
+        // Add the root path to the assets array to ensure it's cached.
+        const assetsToCache = ['/', ...ASSETS];
+        return cache.addAll(assetsToCache);
+      })
+      .then(() => {
+        console.log('[SW] All assets cached');
+      })
+      .catch(error => {
+        console.error('[SW] Caching failed:', error);
+      })
   );
 });
 
+// Activate event: delete old caches
 self.addEventListener('activate', event => {
-  // event.waitUntil(
-  // deleteOldCaches(event)
-  // deleteThenUpdate(event)
-  // );
-  self.clients.claim();
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('[SW] Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => {
+      // Tell the active service worker to take control of the page immediately.
+      return self.clients.claim();
+    })
+  );
 });
 
-// self.addEventListener('fetch', event => {
-//   event.respondWith(
-//     caches.match(event.request).then(response => response || fetch(event.request))
-//   );
-// });
-
+// Fetch event: serve from cache, fall back to network
 self.addEventListener('fetch', event => {
-  // console.log('[SW] Fetch intercepted:', event.request.url);
-
-  return event.respondWith(cacheFirst(event));
+  event.respondWith(
+    caches.match(event.request)
+      .then(cachedResponse => {
+        // Return cached response if found
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        // Otherwise, fetch from network
+        return fetch(event.request).then(networkResponse => {
+          // Optionally, cache the new response for future requests
+          // Be careful with what you cache, especially for dynamic APIs.
+          return networkResponse;
+        });
+      })
+  );
 });
 
-// ð Listen for 'update' request from page
+// Message event: listen for a message from the client to skip waiting
 self.addEventListener('message', event => {
-  if (event.data === 'check-for-update') {
-    handleUpdate(event);
+  if (event.data && event.data.action === 'skipWaiting') {
+    self.skipWaiting();
   }
 });

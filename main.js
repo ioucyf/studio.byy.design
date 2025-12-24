@@ -1,5 +1,5 @@
-import {Hono} from 'Hono';
-import {serveStatic} from 'Hono/deno';
+import { Hono } from 'hono';
+import { serveStatic } from 'hono/deno';
 
 
 const app = new Hono({strict: 'false'});

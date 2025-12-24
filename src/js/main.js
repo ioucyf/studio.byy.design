@@ -27,17 +27,35 @@ const loadImage = (inputId, imgId) => {
 };
 
 function resetImages() {
+  ['frontInput', 'backInput'].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.value = null;
+    }
+  });
+
   ['frontCard', 'backCard'].forEach(id => {
     const img = document.getElementById(id);
     img.src = '';
     img.style.display = 'none';
-    if (!img.previousElementSibling) {
-      const p = document.createElement('p');
-      p.className = 'placeholder';
-      p.textContent = id.includes('front') ? 'Tap to upload front' : 'Tap to upload back';
-      img.parentNode.insertBefore(p, img);
+
+    const card = img.parentElement;
+    // Remove existing placeholder if one exists
+    const existingPlaceholder = card.querySelector('.placeholder');
+    if (existingPlaceholder) {
+      existingPlaceholder.remove();
     }
+    
+    // Add new placeholder
+    const p = document.createElement('p');
+    p.className = 'placeholder';
+    p.textContent = id.includes('front') ? 'Tap to upload front' : 'Tap to upload back';
+    card.insertBefore(p, img);
   });
+
+  // Re-initialize the listeners to capture the new placeholders
+  loadImage('frontInput', 'frontCard');
+  loadImage('backInput', 'backCard');
 }
 
 function isIOS() {
