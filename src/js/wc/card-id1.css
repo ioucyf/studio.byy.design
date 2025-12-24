@@ -1,0 +1,10 @@
+@import '../../css/reset.css' ;
+
+
+:host {
+  width: 85.6cm;
+  height: 53.98cm;
+  border: 1px solid gray;
+  border-radius: 3.18mm;
+}
+
