@@ -6,16 +6,18 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log("[SW] Caching all assets");
+        console.log("[SW-DEV] Caching all assets");
         // Add the root path to the assets array to ensure it's cached.
         const assetsToCache = ["/", ...ASSETS];
         return cache.addAll(assetsToCache);
       })
       .then(() => {
-        console.log("[SW] All assets cached");
+        console.log("[SW-DEV] All assets cached. Forcing update.");
+        // Force the waiting service worker to become the active service worker.
+        self.skipWaiting();
       })
       .catch((error) => {
-        console.error("[SW] Caching failed:", error);
+        console.error("[SW-DEV] Caching failed:", error);
       }),
   );
 });
@@ -27,7 +29,7 @@ self.addEventListener("activate", (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log("[SW] Deleting old cache:", cacheName);
+            console.log("[SW-DEV] Deleting old cache:", cacheName);
             return caches.delete(cacheName);
           }
         }),
@@ -58,9 +60,4 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-// Message event: listen for a message from the client to skip waiting
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.action === "skipWaiting") {
-    self.skipWaiting();
-  }
-});
+// No 'message' listener needed for dev, as we skip waiting automatically.

@@ -1,8 +1,8 @@
 /* Main styles of the project */
-@import url('reset.css');
-@import url('global.css');
-@import url('button.css');
-@import url('print.css');
+@import url("reset.css");
+@import url("global.css");
+@import url("button.css");
+@import url("print.css");
 /* @import url('temp.css'); */
 
 body {
@@ -11,9 +11,9 @@ body {
   grid-template-rows: auto 1fr min-content;
   grid-template-columns: 1fr;
   grid-template-areas:
-    'header'
-    'main'
-    'footer';
+    "header"
+    "main"
+    "footer";
 
   overflow: hidden;
   padding-bottom: 25px;
@@ -120,7 +120,7 @@ main {
   }
 }
 
-input[type='file'] {
+input[type="file"] {
   display: none;
 }
 
@@ -130,8 +130,8 @@ footer {
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 1fr;
   grid-template-areas:
-    'footer-content'
-    'footer-version';
+    "footer-content"
+    "footer-version";
 
   align-items: start;
   justify-content: center;
