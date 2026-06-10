@@ -10,13 +10,13 @@
     "@std/cli": "https://deno.land/std@0.224.0/cli/mod.ts",
     "@std/fs": "https://deno.land/std@0.177.0/fs/mod.ts",
     "@std/path": "https://deno.land/std@0.177.0/path/mod.ts",
-    "hono": "npm:hono@^4.11.1",
-    "hono/deno": "npm:hono@^4.11.1/deno",
+    "hono": "npm:hono@^4.12.25",
+    "hono/deno": "npm:hono@^4.12.25/deno",
     "autoprefixer": "npm:autoprefixer@10.4.23",
-    "cssnano": "npm:cssnano@^7.0.1",
+    "cssnano": "npm:cssnano@^7.1.9",
     "postcss": "npm:postcss@8.5.6",
-    "postcss-cli": "npm:postcss-cli@^11.0.0",
+    "postcss-cli": "npm:postcss-cli@^11.0.1",
     "postcss-import": "npm:postcss-import@16.1.1",
-    "postcss-preset-env": "npm:postcss-preset-env@^9.5.11"
+    "postcss-preset-env": "npm:postcss-preset-env@^9.6.0"
   }
 }
