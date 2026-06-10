@@ -6,4 +6,4 @@ style.append(styles);
 const template = document.createElement("template");
 template.content.append(style);
 
-console.log(template);
+// console.log(template);
