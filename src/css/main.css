@@ -5,6 +5,10 @@
 @import url("print.css");
 /* @import url('temp.css'); */
 
+:root {
+  color-scheme: light;
+}
+
 body {
   display: grid;
   /* grid-template-rows: var(--header-height) 1fr var(--footer-height); */
@@ -18,8 +22,7 @@ body {
   overflow: hidden;
   padding-bottom: 25px;
   padding-top: 25px;
-  /* border: 2px solid magenta; */
-  /* background-color: var(--background-color); */
+
 }
 
 header {
